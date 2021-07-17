@@ -1,6 +1,10 @@
 module ZeekAgent;
 
 export {
+#############
+    redef enum Log::ID += {MYLOG};
+############    
+
     type ConnectionTuple: record {
             local_address: addr &default=0.0.0.0;
             remote_address: addr &default=0.0.0.0;
@@ -9,8 +13,8 @@ export {
     };
 
     type SocketInfo: record {
-            seuid: string;
-            connection: ConnectionTuple &default=[];
+            seuid: string &log;
+            connection: ConnectionTuple &default=[] &log;
     };
 
     global socket_events_state: table[string] of vector of SocketInfo;
@@ -19,3 +23,11 @@ export {
     ## Mapping from ip address to hosts ids
     global ipaddr_to_host: table[string] of set[string];
 }
+
+## writing debug logs
+event zeek_init()
+{
+        Log::create_stream(ZeekAgent::MYLOG, [$columns=ZeekAgent::SocketInfo, $path="Zeek-temporary"]);
+}
+
+
